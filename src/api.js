@@ -52,16 +52,12 @@ async function start({ showBrowser = false, phoneValidation = false, qrCodeData 
             return;
         }
         else {
-            if(phoneValidation){
-                goPhoneValidation();
+             if (qrCodeData) {
+                console.log('Getting QRCode data...');
+                console.log('Note: You should use wbm.waitQRCode() inside wbm.start() to avoid errors.');
+                return await getQRCodeData();
             } else {
-                if (qrCodeData) {
-                    console.log('Getting QRCode data...');
-                    console.log('Note: You should use wbm.waitQRCode() inside wbm.start() to avoid errors.');
-                    return await getQRCodeData();
-                } else {
-                    await generateQRCode();
-                }
+                await generateQRCode();
             }
         }
 
@@ -103,31 +99,6 @@ function isInsideChat() {
 function deleteSession() {
     rimraf.sync(tmpPath);
 }
-
-/**
- * return the data used to create the QR Code
- */
-async function goPhoneValidation() {
-    await page.waitFor(5000);
-    //await page.waitForSelector(SELECTORS.CONNECT_WIHT_PHONE, { timeout: 10000 });
-    //await page.click(SELECTORS.CONNECT_WIHT_PHONE);
-
-     const connectButton = await page.$('span._akav');
-    await connectButton.click();
-    /*await page.waitForSelector(SELECTORS.PHONE_INPUT, { timeout: 10000 });
-    await page.type(SELECTORS.PHONE_INPUT, '55984619162');
-    await page.waitFor(2000);
-
-    await page.keyboard.press("Enter");*/
-
-    /*await page.waitForSelector(SELECTORS.QRCODE_DATA, { timeout: 100000 });
-    const qrcodeData = await page.evaluate((SELECTORS) => {
-        let qrcodeDiv = document.querySelector(SELECTORS.QRCODE_DATA);
-        return qrcodeDiv.getAttribute(SELECTORS.QRCODE_DATA_ATTR);
-    }, SELECTORS);
-    return await qrcodeData;*/
-}
-
 
 /**
  * return the data used to create the QR Code
