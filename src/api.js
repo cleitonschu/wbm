@@ -32,7 +32,9 @@ async function start({ showBrowser = false, phoneValidation = false, qrCodeData 
     const args = {
         headless: !showBrowser,
         userDataDir: tmpPath,
-        args: ["--no-sandbox", '--disable-setuid-sandbox'
+        args: ["--no-sandbox", 
+               '--disable-setuid-sandbox', 
+               '--disable-dev-shm-usage' // For Google Cloud Run
             // "--blink-settings=imagesEnabled=false"]
         ]
     }
