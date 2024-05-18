@@ -30,20 +30,22 @@ async function start({ showBrowser = false, qrCodeData = false, session = true }
     const args = {
         headless: !showBrowser,
         userDataDir: tmpPath,
-        args: ["--no-sandbox",
+        args: ["--no-sandbox", '--disable-setuid-sandbox'
             // "--blink-settings=imagesEnabled=false"]
         ]
     }
     try {
+        console.log('Init...');
         browser = await puppeteer.launch(args);
         page = await browser.newPage();
         // prevent dialog blocking page and just accept it(necessary when a message is sent too fast)
         page.on("dialog", async dialog => { await dialog.accept(); });
         // fix the chrome headless mode true issues
         // https://gitmemory.com/issue/GoogleChrome/puppeteer/1766/482797370
-        await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
+        //await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
+        await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36');
         page.setDefaultTimeout(60000);
-
+        console.log('Open web.whatsapp.com...');
         await page.goto("https://web.whatsapp.com");
         if (session && await isAuthenticated()) {
             return;
@@ -158,10 +160,10 @@ async function sendTo(phoneOrContact, message) {
     try {
         process.stdout.write("Sending Message...\r");
         await page.goto(`https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`);
-        await page.waitForSelector(SELECTORS.LOADING, { hidden: true, timeout: 60000 });
-        await page.waitForSelector(SELECTORS.SEND_BUTTON, { timeout: 5000 });
+        await page.waitForSelector(SELECTORS.LOADING, { hidden: true, timeout: 100000 });
+        await page.waitForSelector(SELECTORS.SEND_BUTTON, { timeout: 15000 });
         await page.keyboard.press("Enter");
-        await page.waitFor(1000);
+        await page.waitFor(5000);
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write(`${phone} Sent\n`);
